@@ -1,13 +1,13 @@
 import dotenv from 'dotenv';
 
 dotenv.config();
-
 interface Config {
     port: number;
     nodeEnv: string;
     sms_username: string;
     sms_password: string;
     sms_source: string;
+    mongodbUrl: string;
 }
 
 const config: Config = {
@@ -16,6 +16,7 @@ const config: Config = {
     sms_password: process.env.SMS_PASSWORD!,
     sms_source: process.env.SMS_SOURCE!,
     nodeEnv: process.env.NODE_ENV || 'development',
+    mongodbUrl: process.env.MONGODB_URL!
 };
 
 export default config;

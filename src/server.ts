@@ -9,6 +9,9 @@ import { log } from "./utils/logger";
 import config from "./config/config";
 import routers from "./routes";
 import './jobs/sms.jobs'
+import './jobs/notification.jobs'
+import './jobs/message.jobs'
+import connectToDB from "./database/mongodb";
 
 
 
@@ -31,7 +34,7 @@ app.use(cookieParser());
 app.use(routers);
 
 app.get("/", (req, res) => {
-    res.send("Welcome to the CampusIQ Backend API! 🚀");
+    res.send("Welcome to the SidGrace Backend API! 🚀");
 });
 
 // Global Error Handler: Catches all unhandled errors and sends a generic 500 response.
@@ -46,6 +49,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 // Start Server
 const startServer = async () => {
     try {
+         await connectToDB(); // Ensure DB is connected first
         server.listen(PORT, () => {
             log.info(`✅ Server running on http://localhost:${PORT}`);
         });
