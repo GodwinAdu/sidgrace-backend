@@ -8,14 +8,16 @@ import morgan from "morgan";
 import { log } from "./utils/logger";
 import config from "./config/config";
 import routers from "./routes";
-import './jobs/sms.jobs'
 import './jobs/notification.jobs'
 import './jobs/message.jobs'
 import connectToDB from "./database/mongodb";
+import { smsConfigProblem } from "./actions/sms.actions";
+import { startPrintRelay } from "./print/relay";
 
 
 
 const PORT = config.port || 5000;
+const HOST = config.host || "127.0.0.1";
 
 const app = express();
 const server = createServer(app);
@@ -48,10 +50,18 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 
 // Start Server
 const startServer = async () => {
+    // Independent of the database: receipts must print even if MongoDB is slow to start.
+    startPrintRelay();
     try {
          await connectToDB(); // Ensure DB is connected first
-        server.listen(PORT, () => {
-            log.info(`✅ Server running on http://localhost:${PORT}`);
+        // Bound to 127.0.0.1 by default: only the Next.js app on this PC calls this API
+        // (from server actions), and the SMS route has no auth of its own, so it must
+        // not be reachable from other machines on the network.
+        server.listen(PORT, HOST, () => {
+            log.info(`Server running on http://${HOST}:${PORT}`);
+            const problem = smsConfigProblem();
+            if (problem) log.error(`${problem} - SMS will be queued but not sent until this is fixed in .env`);
+            else log.info(`SMS gateway: SMSOnlineGH, sender "${config.smsonline.senderId}"`);
         });
     } catch (error) {
         console.error("❌ Failed to start application:", error);

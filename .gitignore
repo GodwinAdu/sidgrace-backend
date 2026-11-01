@@ -78,3 +78,13 @@ typings/
 # next.js build output
 
 .next
+
+# compiled TypeScript output
+dist/
+
+# all local env files (secrets: API keys, DB URL)
+.env.*
+!.env.example
+
+# print relay certificate (private key)
+certs/

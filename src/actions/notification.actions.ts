@@ -28,17 +28,10 @@ export async function checkNotificationPending() {
             { $set: { status: "published" } }
         );
 
-        // Optionally return the updated documents
-        const updatedNotifications = await Notification.find({
-            _id: { $in: idsToUpdate },
-        });
-
-        console.log("completed in here")
-
         return {
             success: true,
-            message: `${updatedNotifications.length} notification(s) published`,
-            data: updatedNotifications,
+            message: `${idsToUpdate.length} scheduled notification(s) published`,
+            data: idsToUpdate,
         };
     } catch (error) {
         console.error("Error in checkNotificationPending:", error);
